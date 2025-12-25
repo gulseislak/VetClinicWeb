@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36811.4
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "DataAccess\DataAccess.csproj", "{AEC4332A-3302-4536-BB98-34BD94B75B81}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vetWeb", "vetWeb\vetWeb.csproj", "{CABECF49-1463-4AD6-A801-EE9630084F39}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AEC4332A-3302-4536-BB98-34BD94B75B81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEC4332A-3302-4536-BB98-34BD94B75B81}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEC4332A-3302-4536-BB98-34BD94B75B81}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEC4332A-3302-4536-BB98-34BD94B75B81}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CABECF49-1463-4AD6-A801-EE9630084F39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CABECF49-1463-4AD6-A801-EE9630084F39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CABECF49-1463-4AD6-A801-EE9630084F39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CABECF49-1463-4AD6-A801-EE9630084F39}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {65270EAC-8131-4D3D-BE20-264D800EEE95}
+	EndGlobalSection
+EndGlobal

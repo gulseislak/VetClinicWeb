@@ -1,0 +1,141 @@
+﻿@page "/invoices"
+@rendermode InteractiveServer
+
+@using DataAccess
+@using vetWeb.Services
+
+@inject InvoiceService InvoiceService
+
+<h3>Invoices</h3>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p style="color:red">@errorMessage</p>
+}
+
+<hr />
+
+<h4>@(isEdit ? "Edit Invoice" : "Add Invoice")</h4>
+
+<div>
+    <label>Appointment ID</label><br />
+    <input type="number" @bind="currentInvoice.AppointmentID" />
+</div>
+
+<div>
+    <label>Total</label><br />
+    <input type="number" step="0.01" @bind="currentInvoice.Total" />
+</div>
+
+<br />
+
+<button type="button" @onclick="Save">
+    @(isEdit ? "Update" : "Add")
+</button>
+
+@if (isEdit)
+{
+    <button type="button" @onclick="Cancel">Cancel</button>
+}
+
+<hr />
+
+<h4>Invoice List</h4>
+
+<table border="1" cellpadding="6">
+    <thead>
+        <tr>
+            <th>InvoiceID</th>
+            <th>AppointmentID</th>
+            <th>Total</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var i in invoices)
+        {
+            <tr>
+                <td>@i.InvoiceID</td>
+                <td>@i.AppointmentID</td>
+                <td>@i.Total</td>
+                <td>
+                    <button type="button" @onclick="() => Edit(i)">Edit</button>
+                    <button type="button" @onclick="() => Delete(i.InvoiceID)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    List<Invoice> invoices = new();
+    Invoice currentInvoice = new();
+    bool isEdit = false;
+    string? errorMessage;
+
+    protected override void OnInitialized()
+    {
+        LoadData();
+    }
+
+    void LoadData()
+    {
+        try
+        {
+            invoices = InvoiceService.GetAll();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Save()
+    {
+        try
+        {
+            if (isEdit)
+                InvoiceService.Update(currentInvoice);
+            else
+                InvoiceService.Add(currentInvoice);
+
+            currentInvoice = new Invoice();
+            isEdit = false;
+            LoadData();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Edit(Invoice i)
+    {
+        currentInvoice = new Invoice
+        {
+            InvoiceID = i.InvoiceID,
+            AppointmentID = i.AppointmentID,
+            Total = i.Total
+        };
+        isEdit = true;
+    }
+
+    void Delete(int id)
+    {
+        try
+        {
+            InvoiceService.Delete(id);
+            LoadData();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Cancel()
+    {
+        currentInvoice = new Invoice();
+        isEdit = false;
+    }
+}

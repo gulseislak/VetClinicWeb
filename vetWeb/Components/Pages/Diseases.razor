@@ -1,0 +1,133 @@
+﻿@page "/diseases"
+@rendermode InteractiveServer
+
+@using DataAccess
+@using vetWeb.Services
+
+@inject DiseaseService DiseaseService
+
+<h3>Diseases</h3>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p style="color:red">@errorMessage</p>
+}
+
+<hr />
+
+<h4>@(isEdit ? "Edit Disease" : "Add Disease")</h4>
+
+<div>
+    <label>Disease Name</label><br />
+    <input @bind="currentDisease.Name" />
+</div>
+
+<br />
+
+<button type="button" @onclick="Save">
+    @(isEdit ? "Update" : "Add")
+</button>
+
+@if (isEdit)
+{
+    <button type="button" @onclick="Cancel">Cancel</button>
+}
+
+<hr />
+
+<h4>Disease List</h4>
+
+<table border="1" cellpadding="6">
+    <thead>
+        <tr>
+            <th>DiseaseID</th>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var d in diseases)
+        {
+            <tr>
+                <td>@d.DiseaseID</td>
+                <td>@d.Name</td>
+                <td>
+                    <button type="button" @onclick="() => Edit(d)">Edit</button>
+                    <button type="button" @onclick="() => Delete(d.DiseaseID)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    List<Disease> diseases = new();
+    Disease currentDisease = new();
+    bool isEdit = false;
+    string? errorMessage;
+
+    protected override void OnInitialized()
+    {
+        LoadData();
+    }
+
+    void LoadData()
+    {
+        try
+        {
+            diseases = DiseaseService.GetAll();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Save()
+    {
+        try
+        {
+            if (isEdit)
+                DiseaseService.Update(currentDisease);
+            else
+                DiseaseService.Add(currentDisease);
+
+            currentDisease = new Disease();
+            isEdit = false;
+            LoadData();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Edit(Disease d)
+    {
+        currentDisease = new Disease
+        {
+            DiseaseID = d.DiseaseID,
+            Name = d.Name
+        };
+        isEdit = true;
+    }
+
+    void Delete(int id)
+    {
+        try
+        {
+            DiseaseService.Delete(id);
+            LoadData();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Cancel()
+    {
+        currentDisease = new Disease();
+        isEdit = false;
+    }
+}

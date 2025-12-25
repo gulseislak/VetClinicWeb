@@ -1,0 +1,133 @@
+﻿@page "/owners"
+@rendermode InteractiveServer
+
+@using DataAccess
+@using vetWeb.Services
+
+@inject OwnerService OwnerService
+
+<h3>Owners</h3>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p style="color:red">@errorMessage</p>
+}
+
+<hr />
+
+<h4>@(isEdit ? "Edit Owner" : "Add Owner")</h4>
+
+<div>
+    <label>Full Name</label><br />
+    <input @bind="currentOwner.FullName" />
+</div>
+
+<br />
+
+<button type="button" @onclick="Save">
+    @(isEdit ? "Update" : "Add")
+</button>
+
+@if (isEdit)
+{
+    <button type="button" @onclick="Cancel">Cancel</button>
+}
+
+<hr />
+
+<h4>Owner List</h4>
+
+<table border="1" cellpadding="6">
+    <thead>
+        <tr>
+            <th>OwnerID</th>
+            <th>Full Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var o in owners)
+        {
+            <tr>
+                <td>@o.OwnerID</td>
+                <td>@o.FullName</td>
+                <td>
+                    <button type="button" @onclick="() => Edit(o)">Edit</button>
+                    <button type="button" @onclick="() => Delete(o.OwnerID)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    List<Owner> owners = new();
+    Owner currentOwner = new();
+    bool isEdit = false;
+    string? errorMessage;
+
+    protected override void OnInitialized()
+    {
+        LoadData();
+    }
+
+    void LoadData()
+    {
+        try
+        {
+            owners = OwnerService.GetAll();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Save()
+    {
+        try
+        {
+            if (isEdit)
+                OwnerService.Update(currentOwner);
+            else
+                OwnerService.Add(currentOwner);
+
+            currentOwner = new Owner();
+            isEdit = false;
+            LoadData();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Edit(Owner o)
+    {
+        currentOwner = new Owner
+        {
+            OwnerID = o.OwnerID,
+            FullName = o.FullName
+        };
+        isEdit = true;
+    }
+
+    void Delete(int id)
+    {
+        try
+        {
+            OwnerService.Delete(id);
+            LoadData();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Cancel()
+    {
+        currentOwner = new Owner();
+        isEdit = false;
+    }
+}

@@ -1,0 +1,157 @@
+﻿@page "/invoiceitems"
+@rendermode InteractiveServer
+
+@using DataAccess
+@using vetWeb.Services
+
+@inject InvoiceItemService InvoiceItemService
+
+<h3>Invoice Items</h3>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p style="color:red">@errorMessage</p>
+}
+
+<hr />
+
+<h4>@(isEdit ? "Edit Invoice Item" : "Add Invoice Item")</h4>
+
+<div>
+    <label>Invoice ID</label><br />
+    <input type="number" @bind="currentItem.InvoiceID" />
+</div>
+
+<div>
+    <label>Treatment ID</label><br />
+    <input type="number" @bind="currentItem.TreatmentID" />
+</div>
+
+<div>
+    <label>Quantity</label><br />
+    <input type="number" @bind="currentItem.Quantity" />
+</div>
+
+<div>
+    <label>Line Total</label><br />
+    <input type="number" step="0.01" @bind="currentItem.LineTotal" />
+</div>
+
+<br />
+
+<button type="button" @onclick="Save">
+    @(isEdit ? "Update" : "Add")
+</button>
+
+@if (isEdit)
+{
+    <button type="button" @onclick="Cancel">Cancel</button>
+}
+
+<hr />
+
+<h4>Invoice Item List</h4>
+
+<table border="1" cellpadding="6">
+    <thead>
+        <tr>
+            <th>InvoiceItemID</th>
+            <th>InvoiceID</th>
+            <th>TreatmentID</th>
+            <th>Quantity</th>
+            <th>LineTotal</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var i in items)
+        {
+            <tr>
+                <td>@i.InvoiceItemID</td>
+                <td>@i.InvoiceID</td>
+                <td>@i.TreatmentID</td>
+                <td>@i.Quantity</td>
+                <td>@i.LineTotal</td>
+                <td>
+                    <button type="button" @onclick="() => Edit(i)">Edit</button>
+                    <button type="button" @onclick="() => Delete(i.InvoiceItemID)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    List<InvoiceItem> items = new();
+    InvoiceItem currentItem = new();
+    bool isEdit = false;
+    string? errorMessage;
+
+    protected override void OnInitialized()
+    {
+        LoadData();
+    }
+
+    void LoadData()
+    {
+        try
+        {
+            items = InvoiceItemService.GetAll();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Save()
+    {
+        try
+        {
+            if (isEdit)
+                InvoiceItemService.Update(currentItem);
+            else
+                InvoiceItemService.Add(currentItem);
+
+            currentItem = new InvoiceItem();
+            isEdit = false;
+            LoadData();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Edit(InvoiceItem i)
+    {
+        currentItem = new InvoiceItem
+        {
+            InvoiceItemID = i.InvoiceItemID,
+            InvoiceID = i.InvoiceID,
+            TreatmentID = i.TreatmentID,
+            Quantity = i.Quantity,
+            LineTotal = i.LineTotal
+        };
+        isEdit = true;
+    }
+
+    void Delete(int id)
+    {
+        try
+        {
+            InvoiceItemService.Delete(id);
+            LoadData();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Cancel()
+    {
+        currentItem = new InvoiceItem();
+        isEdit = false;
+    }
+}

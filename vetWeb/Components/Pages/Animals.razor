@@ -1,0 +1,141 @@
+﻿@page "/animals"
+@rendermode InteractiveServer
+
+@using DataAccess
+@using vetWeb.Services
+
+@inject AnimalService AnimalService
+
+<h3>Animals</h3>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p style="color:red">@errorMessage</p>
+}
+
+<hr />
+
+<h4>@(isEdit ? "Edit Animal" : "Add Animal")</h4>
+
+<div>
+    <label>Owner ID</label><br />
+    <input type="number" @bind="currentAnimal.OwnerID" />
+</div>
+
+<div>
+    <label>Name</label><br />
+    <input @bind="currentAnimal.Name" />
+</div>
+
+<br />
+
+<button type="button" @onclick="Save">
+    @(isEdit ? "Update" : "Add")
+</button>
+
+@if (isEdit)
+{
+    <button type="button" @onclick="Cancel">Cancel</button>
+}
+
+<hr />
+
+<h4>Animal List</h4>
+
+<table border="1" cellpadding="6">
+    <thead>
+        <tr>
+            <th>AnimalID</th>
+            <th>OwnerID</th>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var a in animals)
+        {
+            <tr>
+                <td>@a.AnimalID</td>
+                <td>@a.OwnerID</td>
+                <td>@a.Name</td>
+                <td>
+                    <button type="button" @onclick="() => Edit(a)">Edit</button>
+                    <button type="button" @onclick="() => Delete(a.AnimalID)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    List<Animal> animals = new();
+    Animal currentAnimal = new();
+    bool isEdit = false;
+    string? errorMessage;
+
+    protected override void OnInitialized()
+    {
+        LoadData();
+    }
+
+    void LoadData()
+    {
+        try
+        {
+            animals = AnimalService.GetAll();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Save()
+    {
+        try
+        {
+            if (isEdit)
+                AnimalService.Update(currentAnimal);
+            else
+                AnimalService.Add(currentAnimal);
+
+            currentAnimal = new Animal();
+            isEdit = false;
+            LoadData();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Edit(Animal a)
+    {
+        currentAnimal = new Animal
+        {
+            AnimalID = a.AnimalID,
+            OwnerID = a.OwnerID,
+            Name = a.Name
+        };
+        isEdit = true;
+    }
+
+    void Delete(int id)
+    {
+        try
+        {
+            AnimalService.Delete(id);
+            LoadData();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Cancel()
+    {
+        currentAnimal = new Animal();
+        isEdit = false;
+    }
+}

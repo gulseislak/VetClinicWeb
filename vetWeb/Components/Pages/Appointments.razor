@@ -1,0 +1,176 @@
+﻿@page "/appointments"
+@rendermode InteractiveServer
+@inject AppointmentService AppointmentService
+@using DataAccess
+@using vetWeb.Services
+
+
+<h3>Appointments</h3>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p style="color:red">@errorMessage</p>
+}
+
+<hr />
+
+<h4>@(isEdit ? "Edit Appointment" : "Add Appointment")</h4>
+
+<div>
+    <label>Animal ID</label><br />
+    <input type="number" @bind="currentAppointment.AnimalID" />
+</div>
+
+<div>
+    <label>Veterinarian ID</label><br />
+    <input type="number" @bind="currentAppointment.VetID" />
+</div>
+
+<div>
+    <label>Start Date & Time</label><br />
+    <input type="datetime-local"
+           @bind="startAtLocal" />
+</div>
+
+<div>
+    <label>Status</label><br />
+    <input @bind="currentAppointment.Status" />
+</div>
+
+<div>
+    <label>Notes</label><br />
+    <textarea @bind="currentAppointment.Notes"></textarea>
+</div>
+
+<br />
+
+<button type="button" @onclick="Save">
+    @(isEdit ? "Update" : "Add")
+</button>
+
+@if (isEdit)
+{
+    <button type="button" @onclick="Cancel">Cancel</button>
+}
+
+<hr />
+
+<h4>Appointment List</h4>
+
+<table border="1" cellpadding="6">
+    <thead>
+        <tr>
+            <th>AnimalID</th>
+            <th>VetID</th>
+            <th>StartAt</th>
+            <th>Status</th>
+            <th>Notes</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var a in appointments)
+        {
+            <tr>
+                <td>@a.AnimalID</td>
+                <td>@a.VetID</td>
+                <td>@a.StartAt</td>
+                <td>@a.Status</td>
+                <td>@a.Notes</td>
+                <td>
+                    <button type="button" @onclick="() => Edit(a)">Edit</button>
+                    <button type="button" @onclick="() => Delete(a.AppointmentID)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    List<Appointment> appointments = new();
+    Appointment currentAppointment = new();
+    bool isEdit = false;
+    string? errorMessage;
+
+    // datetime-local için ara property
+    DateTime startAtLocal
+    {
+        get => currentAppointment.StartAt == default
+            ? DateTime.Now
+            : currentAppointment.StartAt;
+        set => currentAppointment.StartAt = value;
+    }
+
+    protected override void OnInitialized()
+    {
+        LoadData();
+    }
+
+    void LoadData()
+    {
+        try
+        {
+            appointments = AppointmentService.GetAll();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Save()
+    {
+        try
+        {
+            if (isEdit)
+            {
+                AppointmentService.Update(currentAppointment);
+            }
+            else
+            {
+                AppointmentService.Add(currentAppointment);
+            }
+
+            currentAppointment = new Appointment();
+            isEdit = false;
+            LoadData();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Edit(Appointment a)
+    {
+        currentAppointment = new Appointment
+        {
+            AppointmentID = a.AppointmentID,
+            AnimalID = a.AnimalID,
+            VetID = a.VetID,
+            StartAt = a.StartAt,
+            Status = a.Status,
+            Notes = a.Notes
+        };
+        isEdit = true;
+    }
+
+    void Delete(int id)
+    {
+        try
+        {
+            AppointmentService.Delete(id);
+            LoadData();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Cancel()
+    {
+        currentAppointment = new Appointment();
+        isEdit = false;
+    }
+}

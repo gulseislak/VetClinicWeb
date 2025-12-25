@@ -1,0 +1,141 @@
+﻿@page "/veterinarians"
+@using DataAccess
+@using vetWeb.Services
+@rendermode InteractiveServer
+@inject VeterinarianService VetService
+
+<h3>Veterinarians</h3>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p style="color:red">@errorMessage</p>
+}
+
+<hr />
+
+<h4>@(isEdit ? "Edit Veterinarian" : "Add Veterinarian")</h4>
+
+<div>
+    <label>Full Name</label><br />
+    <input @bind="currentVet.FullName" />
+</div>
+
+<div>
+    <label>Specialty</label><br />
+    <input @bind="currentVet.Specialty" />
+</div>
+
+<br />
+
+<button type="button" @onclick="Save">
+    @(isEdit ? "Update" : "Add")
+</button>
+
+@if (isEdit)
+{
+    <button type="button" @onclick="Cancel">Cancel</button>
+}
+
+<hr />
+
+<h4>Veterinarian List</h4>
+
+<table border="1" cellpadding="6">
+    <thead>
+        <tr>
+            <th>Full Name</th>
+            <th>Specialty</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var vet in veterinarians)
+        {
+            <tr>
+                <td>@vet.FullName</td>
+                <td>@vet.Specialty</td>
+                <td>
+                    <button type="button" @onclick="() => Edit(vet)">Edit</button>
+                    <button type="button" @onclick="() => Delete(vet.VetID)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    List<Veterinarian> veterinarians = new();
+    Veterinarian currentVet = new();
+    bool isEdit = false;
+    string? errorMessage;
+
+    protected override void OnInitialized()
+    {
+        LoadData();
+    }
+
+    void LoadData()
+    {
+        try
+        {
+            veterinarians = VetService.GetAll();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Save()
+    {
+        try
+        {
+            if (isEdit)
+            {
+                VetService.Update(currentVet);
+            }
+            else
+            {
+                VetService.Add(currentVet);
+            }
+
+            currentVet = new Veterinarian();
+            isEdit = false;
+            LoadData();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Edit(Veterinarian vet)
+    {
+        currentVet = new Veterinarian
+        {
+            VetID = vet.VetID,
+            FullName = vet.FullName,
+            Specialty = vet.Specialty
+        };
+        isEdit = true;
+    }
+
+    void Delete(int vetId)
+    {
+        try
+        {
+            VetService.Delete(vetId);
+            LoadData();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Cancel()
+    {
+        currentVet = new Veterinarian();
+        isEdit = false;
+    }
+}

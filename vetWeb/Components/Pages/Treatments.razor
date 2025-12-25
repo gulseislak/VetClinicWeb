@@ -1,0 +1,141 @@
+﻿@page "/treatments"
+@rendermode InteractiveServer
+
+@using DataAccess
+@using vetWeb.Services
+
+@inject TreatmentService TreatmentService
+
+<h3>Treatments</h3>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p style="color:red">@errorMessage</p>
+}
+
+<hr />
+
+<h4>@(isEdit ? "Edit Treatment" : "Add Treatment")</h4>
+
+<div>
+    <label>Name</label><br />
+    <input @bind="currentTreatment.Name" />
+</div>
+
+<div>
+    <label>Unit Price</label><br />
+    <input type="number" step="0.01" @bind="currentTreatment.UnitPrice" />
+</div>
+
+<br />
+
+<button type="button" @onclick="Save">
+    @(isEdit ? "Update" : "Add")
+</button>
+
+@if (isEdit)
+{
+    <button type="button" @onclick="Cancel">Cancel</button>
+}
+
+<hr />
+
+<h4>Treatment List</h4>
+
+<table border="1" cellpadding="6">
+    <thead>
+        <tr>
+            <th>TreatmentID</th>
+            <th>Name</th>
+            <th>Unit Price</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var t in treatments)
+        {
+            <tr>
+                <td>@t.TreatmentID</td>
+                <td>@t.Name</td>
+                <td>@t.UnitPrice</td>
+                <td>
+                    <button type="button" @onclick="() => Edit(t)">Edit</button>
+                    <button type="button" @onclick="() => Delete(t.TreatmentID)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    List<Treatment> treatments = new();
+    Treatment currentTreatment = new();
+    bool isEdit = false;
+    string? errorMessage;
+
+    protected override void OnInitialized()
+    {
+        LoadData();
+    }
+
+    void LoadData()
+    {
+        try
+        {
+            treatments = TreatmentService.GetAll();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Save()
+    {
+        try
+        {
+            if (isEdit)
+                TreatmentService.Update(currentTreatment);
+            else
+                TreatmentService.Add(currentTreatment);
+
+            currentTreatment = new Treatment();
+            isEdit = false;
+            LoadData();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Edit(Treatment t)
+    {
+        currentTreatment = new Treatment
+        {
+            TreatmentID = t.TreatmentID,
+            Name = t.Name,
+            UnitPrice = t.UnitPrice
+        };
+        isEdit = true;
+    }
+
+    void Delete(int id)
+    {
+        try
+        {
+            TreatmentService.Delete(id);
+            LoadData();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Cancel()
+    {
+        currentTreatment = new Treatment();
+        isEdit = false;
+    }
+}

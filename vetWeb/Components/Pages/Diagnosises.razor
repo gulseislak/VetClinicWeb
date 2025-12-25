@@ -1,0 +1,148 @@
+﻿@page "/diagnosis"
+@rendermode InteractiveServer
+@using DataAccess
+@using vetWeb.Services
+
+@inject DiagnosisService DiagnosisService
+
+<h3>Diagnosis</h3>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p style="color:red">@errorMessage</p>
+}
+
+<hr />
+
+<h4>@(isEdit ? "Edit Diagnosis" : "Add Diagnosis")</h4>
+
+<div>
+    <label>Appointment ID</label><br />
+    <input type="number" @bind="currentDiagnosis.AppointmentID" />
+</div>
+
+<div>
+    <label>Disease ID</label><br />
+    <input type="number" @bind="currentDiagnosis.DiseaseID" />
+</div>
+
+<div>
+    <label>Notes</label><br />
+    <textarea @bind="currentDiagnosis.Notes"></textarea>
+</div>
+
+<br />
+
+<button type="button" @onclick="Save">
+    @(isEdit ? "Update" : "Add")
+</button>
+
+@if (isEdit)
+{
+    <button type="button" @onclick="Cancel">Cancel</button>
+}
+
+<hr />
+
+<h4>Diagnosis List</h4>
+
+<table border="1" cellpadding="6">
+    <thead>
+        <tr>
+            <th>DiagnosisID</th>
+            <th>AppointmentID</th>
+            <th>DiseaseID</th>
+            <th>Notes</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var d in diagnoses)
+        {
+            <tr>
+                <td>@d.DiagnosisID</td>
+                <td>@d.AppointmentID</td>
+                <td>@d.DiseaseID</td>
+                <td>@d.Notes</td>
+                <td>
+                    <button type="button" @onclick="() => Edit(d)">Edit</button>
+                    <button type="button" @onclick="() => Delete(d.DiagnosisID)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    List<Diagnosis> diagnoses = new();
+    Diagnosis currentDiagnosis = new();
+    bool isEdit = false;
+    string? errorMessage;
+
+    protected override void OnInitialized()
+    {
+        LoadData();
+    }
+
+    void LoadData()
+    {
+        try
+        {
+            diagnoses = DiagnosisService.GetAll();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Save()
+    {
+        try
+        {
+            if (isEdit)
+                DiagnosisService.Update(currentDiagnosis);
+            else
+                DiagnosisService.Add(currentDiagnosis);
+
+            currentDiagnosis = new Diagnosis();
+            isEdit = false;
+            LoadData();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Edit(Diagnosis d)
+    {
+        currentDiagnosis = new Diagnosis
+        {
+            DiagnosisID = d.DiagnosisID,
+            AppointmentID = d.AppointmentID,
+            DiseaseID = d.DiseaseID,
+            Notes = d.Notes
+        };
+        isEdit = true;
+    }
+
+    void Delete(int id)
+    {
+        try
+        {
+            DiagnosisService.Delete(id);
+            LoadData();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Cancel()
+    {
+        currentDiagnosis = new Diagnosis();
+        isEdit = false;
+    }
+}
