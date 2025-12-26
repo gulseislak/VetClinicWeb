@@ -118,6 +118,7 @@
       <DependentUpon>seng.edmx</DependentUpon>
       <LastGenOutput>seng.Context.cs</LastGenOutput>
     </Content>
+    <Content Include="seng.edmx.sql" />
     <Content Include="seng.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>seng.edmx</DependentUpon>

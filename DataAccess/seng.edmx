@@ -4,224 +4,223 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="VetClinic_Group6Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <EntityType Name="Animal">
-          <Key>
-            <PropertyRef Name="AnimalID" />
-          </Key>
-          <Property Name="AnimalID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="OwnerID" Type="int" Nullable="false" />
-          <Property Name="Name" Type="nvarchar" MaxLength="100" Nullable="false" />
-        </EntityType>
-        <EntityType Name="Appointment">
-          <Key>
-            <PropertyRef Name="AppointmentID" />
-          </Key>
-          <Property Name="AppointmentID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="AnimalID" Type="int" Nullable="false" />
-          <Property Name="VetID" Type="int" Nullable="false" />
-          <Property Name="StartAt" Type="datetime2" Precision="7" Nullable="false" />
-          <Property Name="Status" Type="nvarchar" MaxLength="20" Nullable="false" />
-          <Property Name="Notes" Type="nvarchar" MaxLength="200" />
-        </EntityType>
-        <EntityType Name="Diagnosis">
-          <Key>
-            <PropertyRef Name="DiagnosisID" />
-          </Key>
-          <Property Name="DiagnosisID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="AppointmentID" Type="int" Nullable="false" />
-          <Property Name="DiseaseID" Type="int" Nullable="false" />
-          <Property Name="Notes" Type="nvarchar" MaxLength="200" />
-        </EntityType>
-        <EntityType Name="Disease">
-          <Key>
-            <PropertyRef Name="DiseaseID" />
-          </Key>
-          <Property Name="DiseaseID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Name" Type="nvarchar" MaxLength="100" Nullable="false" />
-        </EntityType>
-        <EntityType Name="Invoice">
-          <Key>
-            <PropertyRef Name="InvoiceID" />
-          </Key>
-          <Property Name="InvoiceID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="AppointmentID" Type="int" Nullable="false" />
-          <Property Name="Total" Type="decimal" Precision="10" Scale="2" Nullable="false" />
-        </EntityType>
-        <EntityType Name="InvoiceItem">
-          <Key>
-            <PropertyRef Name="InvoiceItemID" />
-          </Key>
-          <Property Name="InvoiceItemID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="InvoiceID" Type="int" Nullable="false" />
-          <Property Name="TreatmentID" Type="int" Nullable="false" />
-          <Property Name="Quantity" Type="int" Nullable="false" />
-          <Property Name="LineTotal" Type="decimal" Precision="10" Scale="2" Nullable="false" />
-        </EntityType>
-        <EntityType Name="Owner">
-          <Key>
-            <PropertyRef Name="OwnerID" />
-          </Key>
-          <Property Name="OwnerID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="FullName" Type="nvarchar" MaxLength="100" Nullable="false" />
-        </EntityType>
-        <EntityType Name="Treatment">
-          <Key>
-            <PropertyRef Name="TreatmentID" />
-          </Key>
-          <Property Name="TreatmentID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Name" Type="nvarchar" MaxLength="100" Nullable="false" />
-          <Property Name="UnitPrice" Type="decimal" Precision="10" Scale="2" Nullable="false" />
-        </EntityType>
-        <EntityType Name="Veterinarian">
-          <Key>
-            <PropertyRef Name="VetID" />
-          </Key>
-          <Property Name="VetID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="FullName" Type="nvarchar" MaxLength="100" Nullable="false" />
-          <Property Name="Specialty" Type="nvarchar" MaxLength="50" Nullable="false" />
-        </EntityType>
-        <Association Name="FK__Animal__OwnerID__3F466844">
-          <End Role="Owner" Type="Self.Owner" Multiplicity="1" />
-          <End Role="Animal" Type="Self.Animal" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Owner">
-              <PropertyRef Name="OwnerID" />
-            </Principal>
-            <Dependent Role="Animal">
-              <PropertyRef Name="OwnerID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK__Appointme__Anima__4316F928">
-          <End Role="Animal" Type="Self.Animal" Multiplicity="1" />
-          <End Role="Appointment" Type="Self.Appointment" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Animal">
-              <PropertyRef Name="AnimalID" />
-            </Principal>
-            <Dependent Role="Appointment">
-              <PropertyRef Name="AnimalID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK__Appointme__VetID__440B1D61">
-          <End Role="Veterinarian" Type="Self.Veterinarian" Multiplicity="1" />
-          <End Role="Appointment" Type="Self.Appointment" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Veterinarian">
-              <PropertyRef Name="VetID" />
-            </Principal>
-            <Dependent Role="Appointment">
-              <PropertyRef Name="VetID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK__Diagnosis__Appoi__46E78A0C">
-          <End Role="Appointment" Type="Self.Appointment" Multiplicity="1" />
-          <End Role="Diagnosis" Type="Self.Diagnosis" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Appointment">
-              <PropertyRef Name="AppointmentID" />
-            </Principal>
-            <Dependent Role="Diagnosis">
-              <PropertyRef Name="AppointmentID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK__Diagnosis__Disea__47DBAE45">
-          <End Role="Disease" Type="Self.Disease" Multiplicity="1" />
-          <End Role="Diagnosis" Type="Self.Diagnosis" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Disease">
-              <PropertyRef Name="DiseaseID" />
-            </Principal>
-            <Dependent Role="Diagnosis">
-              <PropertyRef Name="DiseaseID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK__Invoice__Appoint__4CA06362">
-          <End Role="Appointment" Type="Self.Appointment" Multiplicity="1" />
-          <End Role="Invoice" Type="Self.Invoice" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Appointment">
-              <PropertyRef Name="AppointmentID" />
-            </Principal>
-            <Dependent Role="Invoice">
-              <PropertyRef Name="AppointmentID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK__InvoiceIt__Invoi__4F7CD00D">
-          <End Role="Invoice" Type="Self.Invoice" Multiplicity="1" />
-          <End Role="InvoiceItem" Type="Self.InvoiceItem" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Invoice">
-              <PropertyRef Name="InvoiceID" />
-            </Principal>
-            <Dependent Role="InvoiceItem">
-              <PropertyRef Name="InvoiceID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK__InvoiceIt__Treat__5070F446">
-          <End Role="Treatment" Type="Self.Treatment" Multiplicity="1" />
-          <End Role="InvoiceItem" Type="Self.InvoiceItem" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Treatment">
-              <PropertyRef Name="TreatmentID" />
-            </Principal>
-            <Dependent Role="InvoiceItem">
-              <PropertyRef Name="TreatmentID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <EntityContainer Name="VetClinic_Group6ModelStoreContainer">
-          <EntitySet Name="Animal" EntityType="Self.Animal" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Appointment" EntityType="Self.Appointment" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Diagnosis" EntityType="Self.Diagnosis" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Disease" EntityType="Self.Disease" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Invoice" EntityType="Self.Invoice" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="InvoiceItem" EntityType="Self.InvoiceItem" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Owner" EntityType="Self.Owner" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Treatment" EntityType="Self.Treatment" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Veterinarian" EntityType="Self.Veterinarian" Schema="dbo" store:Type="Tables" />
-          <AssociationSet Name="FK__Animal__OwnerID__3F466844" Association="Self.FK__Animal__OwnerID__3F466844">
-            <End Role="Owner" EntitySet="Owner" />
-            <End Role="Animal" EntitySet="Animal" />
-          </AssociationSet>
-          <AssociationSet Name="FK__Appointme__Anima__4316F928" Association="Self.FK__Appointme__Anima__4316F928">
-            <End Role="Animal" EntitySet="Animal" />
-            <End Role="Appointment" EntitySet="Appointment" />
-          </AssociationSet>
-          <AssociationSet Name="FK__Appointme__VetID__440B1D61" Association="Self.FK__Appointme__VetID__440B1D61">
-            <End Role="Veterinarian" EntitySet="Veterinarian" />
-            <End Role="Appointment" EntitySet="Appointment" />
-          </AssociationSet>
-          <AssociationSet Name="FK__Diagnosis__Appoi__46E78A0C" Association="Self.FK__Diagnosis__Appoi__46E78A0C">
-            <End Role="Appointment" EntitySet="Appointment" />
-            <End Role="Diagnosis" EntitySet="Diagnosis" />
-          </AssociationSet>
-          <AssociationSet Name="FK__Diagnosis__Disea__47DBAE45" Association="Self.FK__Diagnosis__Disea__47DBAE45">
-            <End Role="Disease" EntitySet="Disease" />
-            <End Role="Diagnosis" EntitySet="Diagnosis" />
-          </AssociationSet>
-          <AssociationSet Name="FK__Invoice__Appoint__4CA06362" Association="Self.FK__Invoice__Appoint__4CA06362">
-            <End Role="Appointment" EntitySet="Appointment" />
-            <End Role="Invoice" EntitySet="Invoice" />
-          </AssociationSet>
-          <AssociationSet Name="FK__InvoiceIt__Invoi__4F7CD00D" Association="Self.FK__InvoiceIt__Invoi__4F7CD00D">
-            <End Role="Invoice" EntitySet="Invoice" />
-            <End Role="InvoiceItem" EntitySet="InvoiceItem" />
-          </AssociationSet>
-          <AssociationSet Name="FK__InvoiceIt__Treat__5070F446" Association="Self.FK__InvoiceIt__Treat__5070F446">
-            <End Role="Treatment" EntitySet="Treatment" />
-            <End Role="InvoiceItem" EntitySet="InvoiceItem" />
-          </AssociationSet>
-        </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+    <Schema Namespace="VetClinic_Group6Model.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2012" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityContainer Name="VetClinic_Group6ModelStoreContainer">
+    <EntitySet Name="Animals" EntityType="VetClinic_Group6Model.Store.Animals" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Appointments" EntityType="VetClinic_Group6Model.Store.Appointments" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Diagnosis" EntityType="VetClinic_Group6Model.Store.Diagnosis" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Diseases" EntityType="VetClinic_Group6Model.Store.Diseases" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Invoices" EntityType="VetClinic_Group6Model.Store.Invoices" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="InvoiceItems" EntityType="VetClinic_Group6Model.Store.InvoiceItems" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Owners" EntityType="VetClinic_Group6Model.Store.Owners" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Treatments" EntityType="VetClinic_Group6Model.Store.Treatments" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Veterinarians" EntityType="VetClinic_Group6Model.Store.Veterinarians" store:Type="Tables" Schema="dbo" />
+    <AssociationSet Name="FK__Animal__OwnerID__3F466844" Association="VetClinic_Group6Model.Store.FK__Animal__OwnerID__3F466844">
+      <End Role="Owner" EntitySet="Owners" />
+      <End Role="Animal" EntitySet="Animals" />
+    </AssociationSet>
+    <AssociationSet Name="FK__Appointme__Anima__4316F928" Association="VetClinic_Group6Model.Store.FK__Appointme__Anima__4316F928">
+      <End Role="Animal" EntitySet="Animals" />
+      <End Role="Appointment" EntitySet="Appointments" />
+    </AssociationSet>
+    <AssociationSet Name="FK__Appointme__VetID__440B1D61" Association="VetClinic_Group6Model.Store.FK__Appointme__VetID__440B1D61">
+      <End Role="Veterinarian" EntitySet="Veterinarians" />
+      <End Role="Appointment" EntitySet="Appointments" />
+    </AssociationSet>
+    <AssociationSet Name="FK__Diagnosis__Appoi__46E78A0C" Association="VetClinic_Group6Model.Store.FK__Diagnosis__Appoi__46E78A0C">
+      <End Role="Appointment" EntitySet="Appointments" />
+      <End Role="Diagnosis" EntitySet="Diagnosis" />
+    </AssociationSet>
+    <AssociationSet Name="FK__Invoice__Appoint__4CA06362" Association="VetClinic_Group6Model.Store.FK__Invoice__Appoint__4CA06362">
+      <End Role="Appointment" EntitySet="Appointments" />
+      <End Role="Invoice" EntitySet="Invoices" />
+    </AssociationSet>
+    <AssociationSet Name="FK__Diagnosis__Disea__47DBAE45" Association="VetClinic_Group6Model.Store.FK__Diagnosis__Disea__47DBAE45">
+      <End Role="Disease" EntitySet="Diseases" />
+      <End Role="Diagnosis" EntitySet="Diagnosis" />
+    </AssociationSet>
+    <AssociationSet Name="FK__InvoiceIt__Invoi__4F7CD00D" Association="VetClinic_Group6Model.Store.FK__InvoiceIt__Invoi__4F7CD00D">
+      <End Role="Invoice" EntitySet="Invoices" />
+      <End Role="InvoiceItem" EntitySet="InvoiceItems" />
+    </AssociationSet>
+    <AssociationSet Name="FK__InvoiceIt__Treat__5070F446" Association="VetClinic_Group6Model.Store.FK__InvoiceIt__Treat__5070F446">
+      <End Role="Treatment" EntitySet="Treatments" />
+      <End Role="InvoiceItem" EntitySet="InvoiceItems" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="Animals">
+    <Key>
+      <PropertyRef Name="AnimalID" />
+    </Key>
+    <Property Name="AnimalID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="OwnerID" Type="int" Nullable="false" />
+    <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="100" />
+  </EntityType>
+  <EntityType Name="Appointments">
+    <Key>
+      <PropertyRef Name="AppointmentID" />
+    </Key>
+    <Property Name="AppointmentID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="AnimalID" Type="int" Nullable="false" />
+    <Property Name="VetID" Type="int" Nullable="false" />
+    <Property Name="StartAt" Type="datetime" Nullable="false" />
+    <Property Name="Status" Type="nvarchar" Nullable="false" MaxLength="20" />
+    <Property Name="Notes" Type="nvarchar" Nullable="true" MaxLength="200" />
+  </EntityType>
+  <EntityType Name="Diagnosis">
+    <Key>
+      <PropertyRef Name="DiagnosisID" />
+    </Key>
+    <Property Name="DiagnosisID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="AppointmentID" Type="int" Nullable="false" />
+    <Property Name="DiseaseID" Type="int" Nullable="false" />
+    <Property Name="Notes" Type="nvarchar" Nullable="true" MaxLength="200" />
+  </EntityType>
+  <EntityType Name="Diseases">
+    <Key>
+      <PropertyRef Name="DiseaseID" />
+    </Key>
+    <Property Name="DiseaseID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="100" />
+  </EntityType>
+  <EntityType Name="Invoices">
+    <Key>
+      <PropertyRef Name="InvoiceID" />
+    </Key>
+    <Property Name="InvoiceID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="AppointmentID" Type="int" Nullable="false" />
+    <Property Name="Total" Type="decimal" Nullable="false" Precision="10" Scale="2" />
+  </EntityType>
+  <EntityType Name="InvoiceItems">
+    <Key>
+      <PropertyRef Name="InvoiceItemID" />
+    </Key>
+    <Property Name="InvoiceItemID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="InvoiceID" Type="int" Nullable="false" />
+    <Property Name="TreatmentID" Type="int" Nullable="false" />
+    <Property Name="Quantity" Type="int" Nullable="false" />
+    <Property Name="LineTotal" Type="decimal" Nullable="false" Precision="10" Scale="2" />
+  </EntityType>
+  <EntityType Name="Owners">
+    <Key>
+      <PropertyRef Name="OwnerID" />
+    </Key>
+    <Property Name="OwnerID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="FullName" Type="nvarchar" Nullable="false" MaxLength="100" />
+  </EntityType>
+  <EntityType Name="Treatments">
+    <Key>
+      <PropertyRef Name="TreatmentID" />
+    </Key>
+    <Property Name="TreatmentID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="UnitPrice" Type="decimal" Nullable="false" Precision="10" Scale="2" />
+  </EntityType>
+  <EntityType Name="Veterinarians">
+    <Key>
+      <PropertyRef Name="VetID" />
+    </Key>
+    <Property Name="VetID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="FullName" Type="nvarchar" Nullable="false" MaxLength="100" />
+    <Property Name="Specialty" Type="nvarchar" Nullable="false" MaxLength="50" />
+  </EntityType>
+  <Association Name="FK__Animal__OwnerID__3F466844">
+    <End Role="Owner" Type="VetClinic_Group6Model.Store.Owners" Multiplicity="1" />
+    <End Role="Animal" Type="VetClinic_Group6Model.Store.Animals" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Owner">
+        <PropertyRef Name="OwnerID" />
+      </Principal>
+      <Dependent Role="Animal">
+        <PropertyRef Name="OwnerID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK__Appointme__Anima__4316F928">
+    <End Role="Animal" Type="VetClinic_Group6Model.Store.Animals" Multiplicity="1" />
+    <End Role="Appointment" Type="VetClinic_Group6Model.Store.Appointments" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Animal">
+        <PropertyRef Name="AnimalID" />
+      </Principal>
+      <Dependent Role="Appointment">
+        <PropertyRef Name="AnimalID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK__Appointme__VetID__440B1D61">
+    <End Role="Veterinarian" Type="VetClinic_Group6Model.Store.Veterinarians" Multiplicity="1" />
+    <End Role="Appointment" Type="VetClinic_Group6Model.Store.Appointments" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Veterinarian">
+        <PropertyRef Name="VetID" />
+      </Principal>
+      <Dependent Role="Appointment">
+        <PropertyRef Name="VetID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK__Diagnosis__Appoi__46E78A0C">
+    <End Role="Appointment" Type="VetClinic_Group6Model.Store.Appointments" Multiplicity="1" />
+    <End Role="Diagnosis" Type="VetClinic_Group6Model.Store.Diagnosis" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Appointment">
+        <PropertyRef Name="AppointmentID" />
+      </Principal>
+      <Dependent Role="Diagnosis">
+        <PropertyRef Name="AppointmentID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK__Invoice__Appoint__4CA06362">
+    <End Role="Appointment" Type="VetClinic_Group6Model.Store.Appointments" Multiplicity="1" />
+    <End Role="Invoice" Type="VetClinic_Group6Model.Store.Invoices" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Appointment">
+        <PropertyRef Name="AppointmentID" />
+      </Principal>
+      <Dependent Role="Invoice">
+        <PropertyRef Name="AppointmentID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK__Diagnosis__Disea__47DBAE45">
+    <End Role="Disease" Type="VetClinic_Group6Model.Store.Diseases" Multiplicity="1" />
+    <End Role="Diagnosis" Type="VetClinic_Group6Model.Store.Diagnosis" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Disease">
+        <PropertyRef Name="DiseaseID" />
+      </Principal>
+      <Dependent Role="Diagnosis">
+        <PropertyRef Name="DiseaseID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK__InvoiceIt__Invoi__4F7CD00D">
+    <End Role="Invoice" Type="VetClinic_Group6Model.Store.Invoices" Multiplicity="1" />
+    <End Role="InvoiceItem" Type="VetClinic_Group6Model.Store.InvoiceItems" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Invoice">
+        <PropertyRef Name="InvoiceID" />
+      </Principal>
+      <Dependent Role="InvoiceItem">
+        <PropertyRef Name="InvoiceID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK__InvoiceIt__Treat__5070F446">
+    <End Role="Treatment" Type="VetClinic_Group6Model.Store.Treatments" Multiplicity="1" />
+    <End Role="InvoiceItem" Type="VetClinic_Group6Model.Store.InvoiceItems" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Treatment">
+        <PropertyRef Name="TreatmentID" />
+      </Principal>
+      <Dependent Role="InvoiceItem">
+        <PropertyRef Name="TreatmentID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="VetClinic_Group6Model" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -416,7 +415,7 @@
         <EntityContainer Name="VetClinic_Group6Entities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Animals" EntityType="Self.Animal" />
           <EntitySet Name="Appointments" EntityType="Self.Appointment" />
-          <EntitySet Name="Diagnosis1" EntityType="VetClinic_Group6Model.Diagnosis" />
+          <EntitySet Name="Diagnosis" EntityType="VetClinic_Group6Model.Diagnosis" />
           <EntitySet Name="Diseases" EntityType="Self.Disease" />
           <EntitySet Name="Invoices" EntityType="Self.Invoice" />
           <EntitySet Name="InvoiceItems" EntityType="Self.InvoiceItem" />
@@ -437,7 +436,7 @@
           </AssociationSet>
           <AssociationSet Name="FK__Diagnosis__Appoi__46E78A0C" Association="Self.FK__Diagnosis__Appoi__46E78A0C">
             <End Role="Appointment" EntitySet="Appointments" />
-            <End Role="Diagnosis" EntitySet="Diagnosis1" />
+            <End Role="Diagnosis" EntitySet="Diagnosis" />
           </AssociationSet>
           <AssociationSet Name="FK__Invoice__Appoint__4CA06362" Association="Self.FK__Invoice__Appoint__4CA06362">
             <End Role="Appointment" EntitySet="Appointments" />
@@ -445,7 +444,7 @@
           </AssociationSet>
           <AssociationSet Name="FK__Diagnosis__Disea__47DBAE45" Association="Self.FK__Diagnosis__Disea__47DBAE45">
             <End Role="Disease" EntitySet="Diseases" />
-            <End Role="Diagnosis" EntitySet="Diagnosis1" />
+            <End Role="Diagnosis" EntitySet="Diagnosis" />
           </AssociationSet>
           <AssociationSet Name="FK__InvoiceIt__Invoi__4F7CD00D" Association="Self.FK__InvoiceIt__Invoi__4F7CD00D">
             <End Role="Invoice" EntitySet="Invoices" />
@@ -460,96 +459,95 @@
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
-      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="VetClinic_Group6ModelStoreContainer" CdmEntityContainer="VetClinic_Group6Entities">
-          <EntitySetMapping Name="Animals">
-            <EntityTypeMapping TypeName="VetClinic_Group6Model.Animal">
-              <MappingFragment StoreEntitySet="Animal">
-                <ScalarProperty Name="AnimalID" ColumnName="AnimalID" />
-                <ScalarProperty Name="OwnerID" ColumnName="OwnerID" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Appointments">
-            <EntityTypeMapping TypeName="VetClinic_Group6Model.Appointment">
-              <MappingFragment StoreEntitySet="Appointment">
-                <ScalarProperty Name="AppointmentID" ColumnName="AppointmentID" />
-                <ScalarProperty Name="AnimalID" ColumnName="AnimalID" />
-                <ScalarProperty Name="VetID" ColumnName="VetID" />
-                <ScalarProperty Name="StartAt" ColumnName="StartAt" />
-                <ScalarProperty Name="Status" ColumnName="Status" />
-                <ScalarProperty Name="Notes" ColumnName="Notes" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Diagnosis1">
-            <EntityTypeMapping TypeName="VetClinic_Group6Model.Diagnosis">
-              <MappingFragment StoreEntitySet="Diagnosis">
-                <ScalarProperty Name="DiagnosisID" ColumnName="DiagnosisID" />
-                <ScalarProperty Name="AppointmentID" ColumnName="AppointmentID" />
-                <ScalarProperty Name="DiseaseID" ColumnName="DiseaseID" />
-                <ScalarProperty Name="Notes" ColumnName="Notes" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Diseases">
-            <EntityTypeMapping TypeName="VetClinic_Group6Model.Disease">
-              <MappingFragment StoreEntitySet="Disease">
-                <ScalarProperty Name="DiseaseID" ColumnName="DiseaseID" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Invoices">
-            <EntityTypeMapping TypeName="VetClinic_Group6Model.Invoice">
-              <MappingFragment StoreEntitySet="Invoice">
-                <ScalarProperty Name="InvoiceID" ColumnName="InvoiceID" />
-                <ScalarProperty Name="AppointmentID" ColumnName="AppointmentID" />
-                <ScalarProperty Name="Total" ColumnName="Total" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="InvoiceItems">
-            <EntityTypeMapping TypeName="VetClinic_Group6Model.InvoiceItem">
-              <MappingFragment StoreEntitySet="InvoiceItem">
-                <ScalarProperty Name="InvoiceItemID" ColumnName="InvoiceItemID" />
-                <ScalarProperty Name="InvoiceID" ColumnName="InvoiceID" />
-                <ScalarProperty Name="TreatmentID" ColumnName="TreatmentID" />
-                <ScalarProperty Name="Quantity" ColumnName="Quantity" />
-                <ScalarProperty Name="LineTotal" ColumnName="LineTotal" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Owners">
-            <EntityTypeMapping TypeName="VetClinic_Group6Model.Owner">
-              <MappingFragment StoreEntitySet="Owner">
-                <ScalarProperty Name="OwnerID" ColumnName="OwnerID" />
-                <ScalarProperty Name="FullName" ColumnName="FullName" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Treatments">
-            <EntityTypeMapping TypeName="VetClinic_Group6Model.Treatment">
-              <MappingFragment StoreEntitySet="Treatment">
-                <ScalarProperty Name="TreatmentID" ColumnName="TreatmentID" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="UnitPrice" ColumnName="UnitPrice" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Veterinarians">
-            <EntityTypeMapping TypeName="VetClinic_Group6Model.Veterinarian">
-              <MappingFragment StoreEntitySet="Veterinarian">
-                <ScalarProperty Name="VetID" ColumnName="VetID" />
-                <ScalarProperty Name="FullName" ColumnName="FullName" />
-                <ScalarProperty Name="Specialty" ColumnName="Specialty" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-        </EntityContainerMapping>
-      </Mapping>
-    </edmx:Mappings>
+    <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="VetClinic_Group6ModelStoreContainer" CdmEntityContainer="VetClinic_Group6Entities">
+    <EntitySetMapping Name="Animals">
+      <EntityTypeMapping TypeName="IsTypeOf(VetClinic_Group6Model.Animal)">
+        <MappingFragment StoreEntitySet="Animals">
+          <ScalarProperty Name="AnimalID" ColumnName="AnimalID" />
+          <ScalarProperty Name="OwnerID" ColumnName="OwnerID" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Appointments">
+      <EntityTypeMapping TypeName="IsTypeOf(VetClinic_Group6Model.Appointment)">
+        <MappingFragment StoreEntitySet="Appointments">
+          <ScalarProperty Name="AppointmentID" ColumnName="AppointmentID" />
+          <ScalarProperty Name="AnimalID" ColumnName="AnimalID" />
+          <ScalarProperty Name="VetID" ColumnName="VetID" />
+          <ScalarProperty Name="StartAt" ColumnName="StartAt" />
+          <ScalarProperty Name="Status" ColumnName="Status" />
+          <ScalarProperty Name="Notes" ColumnName="Notes" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Diagnosis">
+      <EntityTypeMapping TypeName="IsTypeOf(VetClinic_Group6Model.Diagnosis)">
+        <MappingFragment StoreEntitySet="Diagnosis">
+          <ScalarProperty Name="DiagnosisID" ColumnName="DiagnosisID" />
+          <ScalarProperty Name="AppointmentID" ColumnName="AppointmentID" />
+          <ScalarProperty Name="DiseaseID" ColumnName="DiseaseID" />
+          <ScalarProperty Name="Notes" ColumnName="Notes" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Diseases">
+      <EntityTypeMapping TypeName="IsTypeOf(VetClinic_Group6Model.Disease)">
+        <MappingFragment StoreEntitySet="Diseases">
+          <ScalarProperty Name="DiseaseID" ColumnName="DiseaseID" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Invoices">
+      <EntityTypeMapping TypeName="IsTypeOf(VetClinic_Group6Model.Invoice)">
+        <MappingFragment StoreEntitySet="Invoices">
+          <ScalarProperty Name="InvoiceID" ColumnName="InvoiceID" />
+          <ScalarProperty Name="AppointmentID" ColumnName="AppointmentID" />
+          <ScalarProperty Name="Total" ColumnName="Total" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="InvoiceItems">
+      <EntityTypeMapping TypeName="IsTypeOf(VetClinic_Group6Model.InvoiceItem)">
+        <MappingFragment StoreEntitySet="InvoiceItems">
+          <ScalarProperty Name="InvoiceItemID" ColumnName="InvoiceItemID" />
+          <ScalarProperty Name="InvoiceID" ColumnName="InvoiceID" />
+          <ScalarProperty Name="TreatmentID" ColumnName="TreatmentID" />
+          <ScalarProperty Name="Quantity" ColumnName="Quantity" />
+          <ScalarProperty Name="LineTotal" ColumnName="LineTotal" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Owners">
+      <EntityTypeMapping TypeName="IsTypeOf(VetClinic_Group6Model.Owner)">
+        <MappingFragment StoreEntitySet="Owners">
+          <ScalarProperty Name="OwnerID" ColumnName="OwnerID" />
+          <ScalarProperty Name="FullName" ColumnName="FullName" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Treatments">
+      <EntityTypeMapping TypeName="IsTypeOf(VetClinic_Group6Model.Treatment)">
+        <MappingFragment StoreEntitySet="Treatments">
+          <ScalarProperty Name="TreatmentID" ColumnName="TreatmentID" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="UnitPrice" ColumnName="UnitPrice" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Veterinarians">
+      <EntityTypeMapping TypeName="IsTypeOf(VetClinic_Group6Model.Veterinarian)">
+        <MappingFragment StoreEntitySet="Veterinarians">
+          <ScalarProperty Name="VetID" ColumnName="VetID" />
+          <ScalarProperty Name="FullName" ColumnName="FullName" />
+          <ScalarProperty Name="Specialty" ColumnName="Specialty" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping></edmx:Mappings>
   </edmx:Runtime>
   <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
   <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
@@ -563,7 +561,7 @@
         <DesignerProperty Name="ValidateOnBuild" Value="true" />
         <DesignerProperty Name="EnablePluralization" Value="true" />
         <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
-        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="UseLegacyProvider" Value="False" />
         <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
       </DesignerInfoPropertySet>
     </Options>
