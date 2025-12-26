@@ -1,0 +1,151 @@
+@page "/run-sql"
+@rendermode InteractiveServer
+
+<PageTitle>Run SQL Commands</PageTitle>
+
+<div class="container-fluid mt-4">
+    <div class="row mb-3">
+        <div class="col-12">
+            <h2>Run SQL Commands</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="sqlInput" class="form-label">Run SQL Commands</label>
+                        <textarea id="sqlInput" class="form-control" rows="10" @bind="sqlCommand" placeholder="Enter SQL command here..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <button class="btn btn-primary" @onclick="ExecuteSQL">Execute</button>
+                        <button class="btn btn-secondary" @onclick="ClearSQL">Clear</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h5>Results</h5>
+                            @if (!string.IsNullOrEmpty(errorMessage))
+                            {
+                                <div class="alert alert-danger">@errorMessage</div>
+                            }
+                            @if (!string.IsNullOrEmpty(successMessage))
+                            {
+                                <div class="alert alert-success">@successMessage</div>
+                            }
+                            @if (sqlResults != null && sqlResults.Any())
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                @foreach (var header in sqlResults.First().Keys)
+                                                {
+                                                    <th>@header</th>
+                                                }
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var row in sqlResults)
+                                            {
+                                                <tr>
+                                                    @foreach (var value in row.Values)
+                                                    {
+                                                        <td>@value</td>
+                                                    }
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                            else if (rowsAffected > 0)
+                            {
+                                <div class="alert alert-info">
+                                    Command executed successfully. Rows affected: @rowsAffected
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-12">
+            <button class="btn btn-secondary" @onclick="NavigateHome">Home</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Inject] NavigationManager NavigationManager { get; set; } = default!;
+
+    private string sqlCommand = string.Empty;
+    private List<Dictionary<string, object>> sqlResults = new();
+    private string? errorMessage;
+    private string? successMessage;
+    private int rowsAffected = 0;
+
+    private void ExecuteSQL()
+    {
+        errorMessage = null;
+        successMessage = null;
+        sqlResults.Clear();
+        rowsAffected = 0;
+
+        if (string.IsNullOrWhiteSpace(sqlCommand))
+        {
+            errorMessage = "Please enter a SQL command.";
+            return;
+        }
+
+        // TODO: Implement actual SQL execution
+        // This is a placeholder - in a real application, you would:
+        // 1. Validate the SQL command
+        // 2. Execute it against the database
+        // 3. Return results or error messages
+        // 4. Handle security concerns (SQL injection prevention)
+
+        try
+        {
+            // Placeholder logic
+            if (sqlCommand.Trim().StartsWith("SELECT", StringComparison.OrdinalIgnoreCase))
+            {
+                // Simulate SELECT query results
+                sqlResults = new List<Dictionary<string, object>>
+                {
+                    new Dictionary<string, object> { { "Column1", "Value1" }, { "Column2", "Value2" } },
+                    new Dictionary<string, object> { { "Column1", "Value3" }, { "Column2", "Value4" } }
+                };
+                successMessage = "Query executed successfully.";
+            }
+            else
+            {
+                // Simulate UPDATE/INSERT/DELETE
+                rowsAffected = 1;
+                successMessage = "Command executed successfully.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error executing SQL: {ex.Message}";
+        }
+    }
+
+    private void ClearSQL()
+    {
+        sqlCommand = string.Empty;
+        sqlResults.Clear();
+        errorMessage = null;
+        successMessage = null;
+        rowsAffected = 0;
+    }
+
+    private void NavigateHome()
+    {
+        NavigationManager.NavigateTo("/admin");
+    }
+}
+

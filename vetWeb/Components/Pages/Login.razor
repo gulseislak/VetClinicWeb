@@ -1,0 +1,133 @@
+@page "/login"
+@rendermode InteractiveServer
+@layout Layout.LoginLayout
+
+<PageTitle>Login / Registration</PageTitle>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="alert alert-danger mb-3">@errorMessage</div>
+            }
+            <div class="row">
+                <!-- Login Section -->
+                <div class="col-md-6 border-end">
+                    <h3 class="mb-4">Login</h3>
+                    <EditForm Model="@loginModel" OnValidSubmit="HandleLogin" OnInvalidSubmit="HandleLoginInvalid" FormName="loginForm">
+                        <DataAnnotationsValidator />
+                        <AntiforgeryToken />
+                        <div class="mb-3">
+                            <label for="loginEmail" class="form-label">Email</label>
+                            <InputText id="loginEmail" class="form-control" @bind-Value="loginModel.Email" />
+                            <ValidationMessage For="@(() => loginModel.Email)" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="loginPassword" class="form-label">Password</label>
+                            <InputText id="loginPassword" type="password" class="form-control" @bind-Value="loginModel.Password" />
+                            <ValidationMessage For="@(() => loginModel.Password)" />
+                        </div>
+                        <button type="submit" class="btn btn-primary">GO</button>
+                    </EditForm>
+                </div>
+
+                <!-- Signup Section -->
+                <div class="col-md-6 ps-4">
+                    <h3 class="mb-4">Signup</h3>
+                    <EditForm Model="@signupModel" OnValidSubmit="HandleSignup" OnInvalidSubmit="HandleSignupInvalid" FormName="signupForm">
+                        <DataAnnotationsValidator />
+                        <AntiforgeryToken />
+                        <div class="mb-3">
+                            <label for="signupEmail" class="form-label">Email</label>
+                            <InputText id="signupEmail" class="form-control" @bind-Value="signupModel.Email" />
+                            <ValidationMessage For="@(() => signupModel.Email)" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="signupName" class="form-label">Name</label>
+                            <InputText id="signupName" class="form-control" @bind-Value="signupModel.Name" />
+                            <ValidationMessage For="@(() => signupModel.Name)" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="signupPassword" class="form-label">Password</label>
+                            <InputText id="signupPassword" type="password" class="form-control" @bind-Value="signupModel.Password" />
+                            <ValidationMessage For="@(() => signupModel.Password)" />
+                        </div>
+                        <button type="submit" class="btn btn-primary">GO</button>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private LoginModel loginModel = new();
+    private SignupModel signupModel = new();
+    private string? errorMessage;
+
+    private void HandleLogin()
+    {
+        try
+        {
+            // TODO: Implement login logic
+            errorMessage = null;
+            NavigationManager.NavigateTo("/dashboard", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    private void HandleSignup()
+    {
+        try
+        {
+            // TODO: Implement signup logic
+            errorMessage = null;
+            NavigationManager.NavigateTo("/dashboard", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    private void HandleLoginInvalid()
+    {
+        errorMessage = "Please fill in all required fields correctly.";
+    }
+
+    private void HandleSignupInvalid()
+    {
+        errorMessage = "Please fill in all required fields correctly.";
+    }
+
+    [Inject] NavigationManager NavigationManager { get; set; } = default!;
+
+    public class LoginModel
+    {
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Invalid email address")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Password is required")]
+        public string Password { get; set; } = string.Empty;
+    }
+
+    public class SignupModel
+    {
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Invalid email address")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Name is required")]
+        public string Name { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Password is required")]
+        [MinLength(6, ErrorMessage = "Password must be at least 6 characters")]
+        public string Password { get; set; } = string.Empty;
+    }
+}
+

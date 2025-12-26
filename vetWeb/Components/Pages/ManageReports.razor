@@ -1,0 +1,191 @@
+@page "/manage-reports"
+@rendermode InteractiveServer
+
+<PageTitle>Manage Reports</PageTitle>
+
+<div class="container-fluid mt-4">
+    <div class="row mb-3">
+        <div class="col-12">
+            <h2>Manage Clinic Reports</h2>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex gap-2 mb-3">
+                        <button class="btn btn-primary" @onclick="ViewReports">View Reports</button>
+                        <button class="btn btn-success" @onclick="ShowAddForm">Add Report</button>
+                        <button class="btn btn-danger" @onclick="ShowDeleteForm">Delete Report</button>
+                    </div>
+
+                    @if (showAddForm)
+                    {
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5>Add Report</h5>
+                                <EditForm Model="@currentReport" OnValidSubmit="SaveReport" FormName="reportForm">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Report Title</label>
+                                            <InputText class="form-control" @bind-Value="currentReport.Title" />
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Report Date</label>
+                                            <InputDate class="form-control" @bind-Value="currentReport.ReportDate" />
+                                        </div>
+                                        <div class="col-12 mb-3">
+                                            <label class="form-label">Content</label>
+                                            <InputTextArea class="form-control" rows="5" @bind-Value="currentReport.Content" />
+                                        </div>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button type="submit" class="btn btn-primary">Save</button>
+                                        <button type="button" class="btn btn-secondary" @onclick="CancelForm">Cancel</button>
+                                    </div>
+                                </EditForm>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="card">
+                        <div class="card-body">
+                            <h5>Results</h5>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Title</th>
+                                            <th>Date</th>
+                                            <th>Content</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (reports != null && reports.Any())
+                                        {
+                                            @foreach (var report in reports)
+                                            {
+                                                <tr>
+                                                    <td>@report.Id</td>
+                                                    <td>@report.Title</td>
+                                                    <td>@report.ReportDate.ToShortDateString()</td>
+                                                    <td>@(report.Content.Length > 50 ? report.Content.Substring(0, 50) + "..." : report.Content)</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-danger" @onclick="() => DeleteReport(report.Id)">Delete</button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="5" class="text-center">No reports found</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex gap-2">
+                <button class="btn btn-secondary" @onclick="NavigateHome">Home</button>
+                <button class="btn btn-primary" @onclick="HandleConfirm">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Inject] NavigationManager NavigationManager { get; set; } = default!;
+
+    private List<ReportModel> reports = new();
+    private ReportModel currentReport = new();
+    private bool showAddForm = false;
+    private bool showDeleteForm = false;
+
+    protected override void OnInitialized()
+    {
+        ViewReports();
+    }
+
+    private void ViewReports()
+    {
+        // TODO: Load reports from service
+        showAddForm = false;
+        showDeleteForm = false;
+    }
+
+    private void ShowAddForm()
+    {
+        showAddForm = true;
+        showDeleteForm = false;
+        currentReport = new ReportModel();
+    }
+
+    private void ShowDeleteForm()
+    {
+        showDeleteForm = true;
+        showAddForm = false;
+    }
+
+    private void SaveReport()
+    {
+        // TODO: Implement save logic
+        if (reports.Any())
+        {
+            currentReport.Id = reports.Max(r => r.Id) + 1;
+        }
+        else
+        {
+            currentReport.Id = 1;
+        }
+        reports.Add(currentReport);
+        currentReport = new ReportModel();
+        showAddForm = false;
+    }
+
+    private void DeleteReport(int id)
+    {
+        var report = reports.FirstOrDefault(r => r.Id == id);
+        if (report != null)
+        {
+            reports.Remove(report);
+        }
+    }
+
+    private void CancelForm()
+    {
+        currentReport = new ReportModel();
+        showAddForm = false;
+        showDeleteForm = false;
+    }
+
+    private void HandleConfirm()
+    {
+        NavigationManager.NavigateTo("/admin");
+    }
+
+    private void NavigateHome()
+    {
+        NavigationManager.NavigateTo("/admin");
+    }
+
+    public class ReportModel
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public DateTime ReportDate { get; set; } = DateTime.Now;
+        public string Content { get; set; } = string.Empty;
+    }
+}
+

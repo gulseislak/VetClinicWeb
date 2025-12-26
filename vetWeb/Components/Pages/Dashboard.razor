@@ -1,0 +1,27 @@
+@page "/dashboard"
+@rendermode InteractiveServer
+
+<PageTitle>Dashboard</PageTitle>
+
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col-12 d-flex justify-content-end gap-2">
+            <button class="btn btn-outline-secondary" @onclick="NavigateToAccountManager">Account Manager</button>
+            <button class="btn btn-danger" @onclick="HandleLogout">Logout</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Inject] NavigationManager NavigationManager { get; set; } = default!;
+
+    private void NavigateToAccountManager()
+    {
+        NavigationManager.NavigateTo("/manage-account");
+    }
+
+    private void HandleLogout()
+    {
+        NavigationManager.NavigateTo("/login");
+    }
+}

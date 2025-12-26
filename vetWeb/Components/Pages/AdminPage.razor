@@ -1,0 +1,116 @@
+@page "/admin"
+@rendermode InteractiveServer
+
+<PageTitle>Admin Page</PageTitle>
+
+<div class="container-fluid mt-4">
+    <div class="row mb-3">
+        <div class="col-12 d-flex justify-content-end gap-2">
+            <button class="btn btn-secondary" @onclick="NavigateToDashboard">Back to Dashboard</button>
+            <button class="btn btn-danger" @onclick="HandleLogout">Logout</button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Admin Panel</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="mb-3">User Management</h5>
+                            <div class="d-grid gap-2 mb-4">
+                                <button class="btn btn-primary" @onclick="NavigateToVeterinarians">
+                                    View Veterinarians
+                                </button>
+                                <button class="btn btn-primary" @onclick="NavigateToOwners">
+                                    View Pet Owners
+                                </button>
+                                <button class="btn btn-outline-primary" @onclick="NavigateToManageUsers">
+                                    Manage Pet Owners / Veterinarians
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="mb-3">Clinic Management</h5>
+                            <div class="d-grid gap-2 mb-4">
+                                <button class="btn btn-primary" @onclick="NavigateToManageReports">
+                                    Manage Clinic Reports
+                                </button>
+                                <button class="btn btn-primary" @onclick="NavigateToInvoices">
+                                    View Invoices
+                                </button>
+                                <button class="btn btn-outline-primary" @onclick="NavigateToManageAppointments">
+                                    Manage Appointments
+                                </button>
+                                <button class="btn btn-outline-primary" @onclick="NavigateToManageTreatments">
+                                    Manage Treatments
+                                </button>
+                                <button class="btn btn-outline-secondary" @onclick="NavigateToRunSQL">
+                                    Run SQL Commands
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Inject] NavigationManager NavigationManager { get; set; } = default!;
+
+    private void NavigateToDashboard()
+    {
+        NavigationManager.NavigateTo("/dashboard");
+    }
+
+    private void NavigateToManageUsers()
+    {
+        NavigationManager.NavigateTo("/manage-users");
+    }
+
+    private void NavigateToManageAppointments()
+    {
+        NavigationManager.NavigateTo("/manage-appointments");
+    }
+
+    private void NavigateToRunSQL()
+    {
+        NavigationManager.NavigateTo("/run-sql");
+    }
+
+    private void NavigateToManageReports()
+    {
+        NavigationManager.NavigateTo("/manage-reports");
+    }
+
+    private void NavigateToManageTreatments()
+    {
+        NavigationManager.NavigateTo("/manage-treatments");
+    }
+
+    private void NavigateToVeterinarians()
+    {
+        NavigationManager.NavigateTo("/veterinarians");
+    }
+
+    private void NavigateToOwners()
+    {
+        NavigationManager.NavigateTo("/owners");
+    }
+
+    private void NavigateToInvoices()
+    {
+        NavigationManager.NavigateTo("/invoices");
+    }
+
+    private void HandleLogout()
+    {
+        NavigationManager.NavigateTo("/login");
+    }
+}
+

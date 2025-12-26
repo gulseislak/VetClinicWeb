@@ -1,6 +1,8 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿<div class="top-row ps-3 navbar navbar-dark bg-primary">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">vetWeb</a>
+        <a class="navbar-brand text-white" href="/dashboard">
+            <strong>🏥 Vet Clinic Management</strong>
+        </a>
     </div>
 </div>
 
@@ -9,63 +11,128 @@
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
     <nav class="flex-column">
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span>
-                Home
-            </NavLink>
+       
         </div>
 
-        
+        <div class="nav-section px-3 py-2 mt-2">
+            <small class="text-muted text-uppercase">People & Animals</small>
+        </div>
+
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="veterinarians">
+            <NavLink class="nav-link" href="/veterinarians">
                 <span class="bi bi-people-fill-nav-menu" aria-hidden="true"></span>
                 Veterinarians
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="appointments">
-                Appointments
+            <NavLink class="nav-link" href="/owners">
+                <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span>
+                Pet Owners
             </NavLink>
         </div>
+
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="animals">
+            <NavLink class="nav-link" href="/animals">
+                <span class="bi bi-heart-fill-nav-menu" aria-hidden="true"></span>
                 Animals
             </NavLink>
         </div>
+
+        <div class="nav-section px-3 py-2 mt-2">
+            <small class="text-muted text-uppercase">Appointments & Care</small>
+        </div>
+
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="diagnosis">
-                Diagnosis
+            <NavLink class="nav-link" href="/appointments">
+                <span class="bi bi-calendar-check-fill-nav-menu" aria-hidden="true"></span>
+                Appointments
             </NavLink>
         </div>
+
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="diseases">
-                Diseases
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="invoices">
-                Invoices
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="invoiceitems">
-                Invoice Items
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="owners">
-                Owners
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="treatments">
+            <NavLink class="nav-link" href="/treatments">
+                <span class="bi bi-heart-pulse-fill-nav-menu" aria-hidden="true"></span>
                 Treatments
             </NavLink>
         </div>
 
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/diagnosises">
+                <span class="bi bi-clipboard-pulse-fill-nav-menu" aria-hidden="true"></span>
+                Diagnoses
+            </NavLink>
+        </div>
 
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/diseases">
+                <span class="bi bi-virus-fill-nav-menu" aria-hidden="true"></span>
+                Diseases
+            </NavLink>
+        </div>
 
+        <div class="nav-section px-3 py-2 mt-2">
+            <small class="text-muted text-uppercase">Financial</small>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/invoices">
+                <span class="bi bi-receipt-cutoff-fill-nav-menu" aria-hidden="true"></span>
+                Invoices
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/invoiceitems">
+                <span class="bi bi-list-check-nav-menu" aria-hidden="true"></span>
+                Invoice Items
+            </NavLink>
+        </div>
+
+        <div class="nav-section px-3 py-2 mt-2">
+            <small class="text-muted text-uppercase">Administration</small>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/admin">
+                <span class="bi bi-gear-fill-nav-menu" aria-hidden="true"></span>
+                Admin Panel
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/manage-reports">
+                <span class="bi bi-file-earmark-text-fill-nav-menu" aria-hidden="true"></span>
+                Clinic Reports
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/manage-appointments">
+                <span class="bi bi-calendar-event-fill-nav-menu" aria-hidden="true"></span>
+                Manage Appointments
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/manage-users">
+                <span class="bi bi-people-fill-nav-menu" aria-hidden="true"></span>
+                Manage Users
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/manage-treatments">
+                <span class="bi bi-heart-pulse-fill-nav-menu" aria-hidden="true"></span>
+                Manage Treatments
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/manage-account">
+                <span class="bi bi-person-gear-fill-nav-menu" aria-hidden="true"></span>
+                Manage Account
+            </NavLink>
+        </div>
     </nav>
 </div>

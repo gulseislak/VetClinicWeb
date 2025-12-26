@@ -1,15 +1,15 @@
-﻿@page "/owners"
+@page "/manage-treatments"
 @rendermode InteractiveServer
+@inject TreatmentService TreatmentService
 @using DataAccess
 @using vetWeb.Services
-@inject OwnerService OwnerService
 
-<PageTitle>Owners</PageTitle>
+<PageTitle>Manage Treatments</PageTitle>
 
 <div class="container-fluid mt-4">
     <div class="row mb-3">
         <div class="col-12">
-            <h2>Pet Owners</h2>
+            <h2>Manage Treatments</h2>
         </div>
     </div>
 
@@ -18,26 +18,33 @@
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex gap-2 mb-3">
-                        <button class="btn btn-primary" @onclick="ViewAllOwners">View All Owners</button>
-                        <button class="btn btn-success" @onclick="ShowAddForm">Add Owner</button>
-                        <button class="btn btn-danger" @onclick="ShowRemoveForm">Remove Owner</button>
+                        <button class="btn btn-primary" @onclick="ViewTreatments">View Treatments</button>
+                        <button class="btn btn-success" @onclick="ShowAddForm">Add Treatments</button>
+                        <button class="btn btn-danger" @onclick="ShowRemoveForm">Remove Treatments</button>
+                        <button class="btn btn-warning" @onclick="ShowEditForm">Edit Treatments</button>
                     </div>
 
-                    @if (showAddForm)
+                    @if (showAddForm || showEditForm)
                     {
                         <div class="card mb-3">
                             <div class="card-body">
-                                <h5>@(isEdit ? "Edit Owner" : "Add Owner")</h5>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Full Name</label>
-                                        <input type="text" class="form-control" @bind="currentOwner.FullName" @bind:event="oninput" />
+                                <h5>@(showEditForm ? "Edit Treatment" : "Add Treatment")</h5>
+                                <EditForm Model="@currentTreatment" OnValidSubmit="Save" FormName="treatmentForm">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Treatment Name</label>
+                                            <InputText class="form-control" @bind-Value="currentTreatment.Name" />
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Unit Price</label>
+                                            <InputNumber class="form-control" @bind-Value="currentTreatment.UnitPrice" />
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="d-flex gap-2">
-                                    <button class="btn btn-primary" @onclick="Save">@(isEdit ? "Update" : "Add")</button>
-                                    <button class="btn btn-secondary" @onclick="Cancel">Cancel</button>
-                                </div>
+                                    <div class="d-flex gap-2">
+                                        <button type="submit" class="btn btn-primary">@(isEdit ? "Update" : "Add")</button>
+                                        <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+                                    </div>
+                                </EditForm>
                             </div>
                         </div>
                     }
@@ -54,21 +61,23 @@
                                     <thead>
                                         <tr>
                                             <th>ID</th>
-                                            <th>Full Name</th>
+                                            <th>Treatment Name</th>
+                                            <th>Unit Price</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @if (owners != null && owners.Any())
+                                        @if (treatments != null && treatments.Any())
                                         {
-                                            @foreach (var o in owners)
+                                            @foreach (var t in treatments)
                                             {
                                                 <tr>
-                                                    <td>@o.OwnerID</td>
-                                                    <td>@o.FullName</td>
+                                                    <td>@t.TreatmentID</td>
+                                                    <td>@t.Name</td>
+                                                    <td>@t.UnitPrice</td>
                                                     <td>
-                                                        <button class="btn btn-sm btn-warning" @onclick="() => Edit(o)">Edit</button>
-                                                        <button class="btn btn-sm btn-danger" @onclick="() => Delete(o.OwnerID)">Delete</button>
+                                                        <button class="btn btn-sm btn-warning" @onclick="() => Edit(t)">Edit</button>
+                                                        <button class="btn btn-sm btn-danger" @onclick="() => Delete(t.TreatmentID)">Delete</button>
                                                     </td>
                                                 </tr>
                                             }
@@ -76,7 +85,7 @@
                                         else
                                         {
                                             <tr>
-                                                <td colspan="3" class="text-center">No owners found</td>
+                                                <td colspan="4" class="text-center">No treatments found</td>
                                             </tr>
                                         }
                                     </tbody>
@@ -102,44 +111,55 @@
 @code {
     [Inject] NavigationManager NavigationManager { get; set; } = default!;
 
-    List<Owner> owners = new();
-    Owner currentOwner = new();
+    List<Treatment> treatments = new();
+    Treatment currentTreatment = new();
     bool isEdit = false;
     bool showAddForm = false;
+    bool showEditForm = false;
     bool showRemoveForm = false;
     string? errorMessage;
 
     protected override void OnInitialized()
     {
-        ViewAllOwners();
+        ViewTreatments();
     }
 
-    void ViewAllOwners()
+    void ViewTreatments()
     {
         LoadData();
         showAddForm = false;
+        showEditForm = false;
         showRemoveForm = false;
     }
 
     void ShowAddForm()
     {
         showAddForm = true;
+        showEditForm = false;
         showRemoveForm = false;
-        currentOwner = new Owner();
+        currentTreatment = new Treatment();
         isEdit = false;
+    }
+
+    void ShowEditForm()
+    {
+        showEditForm = true;
+        showAddForm = false;
+        showRemoveForm = false;
     }
 
     void ShowRemoveForm()
     {
         showRemoveForm = true;
         showAddForm = false;
+        showEditForm = false;
     }
 
     void LoadData()
     {
         try
         {
-            owners = OwnerService.GetAll();
+            treatments = TreatmentService.GetAll();
             errorMessage = null;
         }
         catch (Exception ex)
@@ -154,16 +174,17 @@
         {
             if (isEdit)
             {
-                OwnerService.Update(currentOwner);
+                TreatmentService.Update(currentTreatment);
             }
             else
             {
-                OwnerService.Add(currentOwner);
+                TreatmentService.Add(currentTreatment);
             }
 
-            currentOwner = new Owner();
+            currentTreatment = new Treatment();
             isEdit = false;
             showAddForm = false;
+            showEditForm = false;
             LoadData();
         }
         catch (Exception ex)
@@ -172,14 +193,16 @@
         }
     }
 
-    void Edit(Owner o)
+    void Edit(Treatment t)
     {
-        currentOwner = new Owner
+        currentTreatment = new Treatment
         {
-            OwnerID = o.OwnerID,
-            FullName = o.FullName
+            TreatmentID = t.TreatmentID,
+            Name = t.Name,
+            UnitPrice = t.UnitPrice
         };
         isEdit = true;
+        showEditForm = true;
         showAddForm = true;
         showRemoveForm = false;
     }
@@ -188,7 +211,7 @@
     {
         try
         {
-            OwnerService.Delete(id);
+            TreatmentService.Delete(id);
             LoadData();
         }
         catch (Exception ex)
@@ -199,19 +222,21 @@
 
     void Cancel()
     {
-        currentOwner = new Owner();
+        currentTreatment = new Treatment();
         isEdit = false;
         showAddForm = false;
+        showEditForm = false;
         showRemoveForm = false;
     }
 
     void HandleConfirm()
     {
-        NavigationManager.NavigateTo("/dashboard");
+        NavigationManager.NavigateTo("/admin");
     }
 
     void NavigateHome()
     {
-        NavigationManager.NavigateTo("/dashboard");
+        NavigationManager.NavigateTo("/admin");
     }
 }
+

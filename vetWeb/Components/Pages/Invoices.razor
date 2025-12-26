@@ -1,81 +1,176 @@
 ﻿@page "/invoices"
 @rendermode InteractiveServer
-
 @using DataAccess
 @using vetWeb.Services
-
 @inject InvoiceService InvoiceService
+@inject InvoiceItemService InvoiceItemService
 
-<h3>Invoices</h3>
+<PageTitle>Invoices</PageTitle>
 
-@if (!string.IsNullOrEmpty(errorMessage))
-{
-    <p style="color:red">@errorMessage</p>
-}
+<div class="container-fluid mt-4">
+    <div class="row mb-3">
+        <div class="col-12">
+            <h2>Invoices</h2>
+        </div>
+    </div>
 
-<hr />
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex gap-2 mb-3">
+                        <button class="btn btn-primary" @onclick="ViewAllInvoices">View All Invoices</button>
+                        <button class="btn btn-success" @onclick="ShowAddForm">Add Invoice</button>
+                    </div>
 
-<h4>@(isEdit ? "Edit Invoice" : "Add Invoice")</h4>
+                    @if (showAddForm)
+                    {
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5>@(isEdit ? "Edit Invoice" : "Add Invoice")</h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Appointment ID</label>
+                                        <input type="number" class="form-control" @bind="currentInvoice.AppointmentID" @bind:event="oninput" />
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Total</label>
+                                        <input type="number" step="0.01" class="form-control" @bind="currentInvoice.Total" @bind:event="oninput" />
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-primary" @onclick="Save">@(isEdit ? "Update" : "Add")</button>
+                                    <button class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                    }
 
-<div>
-    <label>Appointment ID</label><br />
-    <input type="number" @bind="currentInvoice.AppointmentID" />
+                    <div class="card">
+                        <div class="card-body">
+                            <h5>Invoice List</h5>
+                            @if (!string.IsNullOrEmpty(errorMessage))
+                            {
+                                <div class="alert alert-danger">@errorMessage</div>
+                            }
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Invoice ID</th>
+                                            <th>Appointment ID</th>
+                                            <th>Total</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (invoices != null && invoices.Any())
+                                        {
+                                            @foreach (var invoice in invoices)
+                                            {
+                                                <tr>
+                                                    <td>@invoice.InvoiceID</td>
+                                                    <td>@invoice.AppointmentID</td>
+                                                    <td>@invoice.Total</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-info" @onclick="() => ViewInvoiceItems(invoice.InvoiceID)">View Items</button>
+                                                        <button class="btn btn-sm btn-warning" @onclick="() => Edit(invoice)">Edit</button>
+                                                        <button class="btn btn-sm btn-danger" @onclick="() => Delete(invoice.InvoiceID)">Delete</button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="4" class="text-center">No invoices found</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (showInvoiceItems && selectedInvoiceId > 0)
+                    {
+                        <div class="card mt-3">
+                            <div class="card-body">
+                                <h5>Invoice Items for Invoice #@selectedInvoiceId</h5>
+                                <button class="btn btn-sm btn-secondary mb-2" @onclick="CloseInvoiceItems">Close</button>
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Item ID</th>
+                                                <th>Invoice ID</th>
+                                                <th>Treatment ID</th>
+                                                <th>Quantity</th>
+                                                <th>Line Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (invoiceItems != null && invoiceItems.Any())
+                                            {
+                                                @foreach (var item in invoiceItems)
+                                                {
+                                                    <tr>
+                                                        <td>@item.InvoiceItemID</td>
+                                                        <td>@item.InvoiceID</td>
+                                                        <td>@item.TreatmentID</td>
+                                                        <td>@item.Quantity</td>
+                                                        <td>@item.LineTotal</td>
+                                                    </tr>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td colspan="5" class="text-center">No items found for this invoice</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-<div>
-    <label>Total</label><br />
-    <input type="number" step="0.01" @bind="currentInvoice.Total" />
-</div>
-
-<br />
-
-<button type="button" @onclick="Save">
-    @(isEdit ? "Update" : "Add")
-</button>
-
-@if (isEdit)
-{
-    <button type="button" @onclick="Cancel">Cancel</button>
-}
-
-<hr />
-
-<h4>Invoice List</h4>
-
-<table border="1" cellpadding="6">
-    <thead>
-        <tr>
-            <th>InvoiceID</th>
-            <th>AppointmentID</th>
-            <th>Total</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var i in invoices)
-        {
-            <tr>
-                <td>@i.InvoiceID</td>
-                <td>@i.AppointmentID</td>
-                <td>@i.Total</td>
-                <td>
-                    <button type="button" @onclick="() => Edit(i)">Edit</button>
-                    <button type="button" @onclick="() => Delete(i.InvoiceID)">Delete</button>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
 
 @code {
+    [Inject] NavigationManager NavigationManager { get; set; } = default!;
+
     List<Invoice> invoices = new();
+    List<InvoiceItem> invoiceItems = new();
     Invoice currentInvoice = new();
     bool isEdit = false;
+    bool showAddForm = false;
+    bool showInvoiceItems = false;
+    int selectedInvoiceId = 0;
     string? errorMessage;
 
     protected override void OnInitialized()
     {
+        ViewAllInvoices();
+    }
+
+    void ViewAllInvoices()
+    {
         LoadData();
+        showAddForm = false;
+        showInvoiceItems = false;
+    }
+
+    void ShowAddForm()
+    {
+        showAddForm = true;
+        showInvoiceItems = false;
+        currentInvoice = new Invoice();
+        isEdit = false;
     }
 
     void LoadData()
@@ -83,6 +178,7 @@
         try
         {
             invoices = InvoiceService.GetAll();
+            errorMessage = null;
         }
         catch (Exception ex)
         {
@@ -90,17 +186,43 @@
         }
     }
 
+    void ViewInvoiceItems(int invoiceId)
+    {
+        try
+        {
+            selectedInvoiceId = invoiceId;
+            invoiceItems = InvoiceItemService.GetAll().Where(i => i.InvoiceID == invoiceId).ToList();
+            showInvoiceItems = true;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error loading invoice items: {ex.Message}";
+        }
+    }
+
+    void CloseInvoiceItems()
+    {
+        showInvoiceItems = false;
+        selectedInvoiceId = 0;
+        invoiceItems.Clear();
+    }
+
     void Save()
     {
         try
         {
             if (isEdit)
+            {
                 InvoiceService.Update(currentInvoice);
+            }
             else
+            {
                 InvoiceService.Add(currentInvoice);
+            }
 
             currentInvoice = new Invoice();
             isEdit = false;
+            showAddForm = false;
             LoadData();
         }
         catch (Exception ex)
@@ -118,6 +240,7 @@
             Total = i.Total
         };
         isEdit = true;
+        showAddForm = true;
     }
 
     void Delete(int id)
@@ -137,5 +260,6 @@
     {
         currentInvoice = new Invoice();
         isEdit = false;
+        showAddForm = false;
     }
 }

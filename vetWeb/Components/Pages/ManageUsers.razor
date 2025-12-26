@@ -1,0 +1,185 @@
+@page "/manage-users"
+@rendermode InteractiveServer
+@using vetWeb.Services
+@using DataAccess
+
+<PageTitle>Manage Pet Owners / Veterinarians</PageTitle>
+
+<div class="container-fluid mt-4">
+    <div class="row mb-3">
+        <div class="col-12">
+            <h2>Manage Pet Owners / Veterinarians</h2>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex gap-2 mb-3">
+                        <button class="btn btn-primary" @onclick="ViewAllAccounts">View All Accounts</button>
+                        <button class="btn btn-danger" @onclick="RemoveAccount">Remove Account</button>
+                        <select class="form-select" style="width: auto;" @bind="selectedUserType" @bind:event="onchange">
+                            <option value="">All Users</option>
+                            <option value="Owner">Pet Owners</option>
+                            <option value="Veterinarian">Veterinarians</option>
+                        </select>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h5>Results</h5>
+                            @if (!string.IsNullOrEmpty(errorMessage))
+                            {
+                                <div class="alert alert-danger">@errorMessage</div>
+                            }
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (users != null && users.Any())
+                                        {
+                                            @foreach (var user in filteredUsers)
+                                            {
+                                                <tr>
+                                                    <td>@user.Id</td>
+                                                    <td>@user.Name</td>
+                                                    <td>@user.Type</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-danger" @onclick="() => DeleteUser(user.Id, user.Type)">Delete</button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="4" class="text-center">No users found</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex gap-2">
+                <button class="btn btn-secondary" @onclick="NavigateHome">Home</button>
+                <button class="btn btn-primary" @onclick="HandleConfirm">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Inject] NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] OwnerService OwnerService { get; set; } = default!;
+    [Inject] VeterinarianService VeterinarianService { get; set; } = default!;
+
+    private List<UserDisplay> users = new();
+    private string selectedUserType = string.Empty;
+    private string? errorMessage;
+
+    private IEnumerable<UserDisplay> filteredUsers => 
+        string.IsNullOrEmpty(selectedUserType) 
+            ? users 
+            : users.Where(u => u.Type == selectedUserType);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ViewAllAccounts();
+    }
+
+    private async Task ViewAllAccounts()
+    {
+        try
+        {
+            users.Clear();
+            errorMessage = null;
+
+            // Load Owners
+            var owners = OwnerService.GetAll();
+            foreach (var owner in owners)
+            {
+                users.Add(new UserDisplay
+                {
+                    Id = owner.OwnerID,
+                    Name = owner.FullName ?? "N/A",
+                    Type = "Owner"
+                });
+            }
+
+            // Load Veterinarians
+            var veterinarians = VeterinarianService.GetAll();
+            foreach (var vet in veterinarians)
+            {
+                users.Add(new UserDisplay
+                {
+                    Id = vet.VetID,
+                    Name = vet.FullName ?? "N/A",
+                    Type = "Veterinarian"
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error loading users: {ex.Message}";
+        }
+        await Task.CompletedTask;
+    }
+
+    private void RemoveAccount()
+    {
+        // This will be handled by the DeleteUser method
+    }
+
+    private async Task DeleteUser(int userId, string userType)
+    {
+        try
+        {
+            if (userType == "Owner")
+            {
+                OwnerService.Delete(userId);
+            }
+            else if (userType == "Veterinarian")
+            {
+                VeterinarianService.Delete(userId);
+            }
+
+            await ViewAllAccounts();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error deleting user: {ex.Message}";
+        }
+    }
+
+    private void HandleConfirm()
+    {
+        NavigationManager.NavigateTo("/admin");
+    }
+
+    private void NavigateHome()
+    {
+        NavigationManager.NavigateTo("/dashboard");
+    }
+
+    public class UserDisplay
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty;
+    }
+}

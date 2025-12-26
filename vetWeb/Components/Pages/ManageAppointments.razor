@@ -1,0 +1,256 @@
+@page "/manage-appointments"
+@rendermode InteractiveServer
+@inject AppointmentService AppointmentService
+@using DataAccess
+@using vetWeb.Services
+
+<PageTitle>Manage Appointments</PageTitle>
+
+<div class="container-fluid mt-4">
+    <div class="row mb-3">
+        <div class="col-12">
+            <h2>Manage Appointments</h2>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex gap-2 mb-3">
+                        <button class="btn btn-primary" @onclick="ViewAppointments">View Appointment</button>
+                        <button class="btn btn-success" @onclick="ShowAddForm">Add Appointment</button>
+                        <button class="btn btn-danger" @onclick="ShowCancelForm">Cancel Appointment</button>
+                    </div>
+
+                    @if (showAddForm || showCancelForm)
+                    {
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5>@(showAddForm ? "Add Appointment" : "Cancel Appointment")</h5>
+                                <EditForm Model="@currentAppointment" OnValidSubmit="Save" FormName="appointmentForm">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Animal ID</label>
+                                            <InputNumber class="form-control" @bind-Value="currentAppointment.AnimalID" />
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Veterinarian ID</label>
+                                            <InputNumber class="form-control" @bind-Value="currentAppointment.VetID" />
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Start Date & Time</label>
+                                            <InputDate class="form-control" @bind-Value="startAtLocal" />
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Status</label>
+                                            <InputText class="form-control" @bind-Value="currentAppointment.Status" />
+                                        </div>
+                                        <div class="col-12 mb-3">
+                                            <label class="form-label">Notes</label>
+                                            <InputTextArea class="form-control" @bind-Value="currentAppointment.Notes" />
+                                        </div>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button type="submit" class="btn btn-primary">@(isEdit ? "Update" : "Add")</button>
+                                        <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+                                    </div>
+                                </EditForm>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="card">
+                        <div class="card-body">
+                            <h5>Results</h5>
+                            @if (!string.IsNullOrEmpty(errorMessage))
+                            {
+                                <div class="alert alert-danger">@errorMessage</div>
+                            }
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Animal ID</th>
+                                            <th>Vet ID</th>
+                                            <th>Start At</th>
+                                            <th>Status</th>
+                                            <th>Notes</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (appointments != null && appointments.Any())
+                                        {
+                                            @foreach (var a in appointments)
+                                            {
+                                                <tr>
+                                                    <td>@a.AppointmentID</td>
+                                                    <td>@a.AnimalID</td>
+                                                    <td>@a.VetID</td>
+                                                    <td>@a.StartAt</td>
+                                                    <td>@a.Status</td>
+                                                    <td>@a.Notes</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-primary" @onclick="() => Edit(a)">Edit</button>
+                                                        <button class="btn btn-sm btn-danger" @onclick="() => Delete(a.AppointmentID)">Delete</button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="7" class="text-center">No appointments found</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex gap-2">
+                <button class="btn btn-secondary" @onclick="NavigateHome">Home</button>
+                <button class="btn btn-primary" @onclick="HandleConfirm">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Inject] NavigationManager NavigationManager { get; set; } = default!;
+
+    List<Appointment> appointments = new();
+    Appointment currentAppointment = new();
+    bool isEdit = false;
+    bool showAddForm = false;
+    bool showCancelForm = false;
+    string? errorMessage;
+
+    DateTime startAtLocal
+    {
+        get => currentAppointment.StartAt == default
+            ? DateTime.Now
+            : currentAppointment.StartAt;
+        set => currentAppointment.StartAt = value;
+    }
+
+    protected override void OnInitialized()
+    {
+        ViewAppointments();
+    }
+
+    void ViewAppointments()
+    {
+        LoadData();
+        showAddForm = false;
+        showCancelForm = false;
+    }
+
+    void ShowAddForm()
+    {
+        showAddForm = true;
+        showCancelForm = false;
+        currentAppointment = new Appointment();
+        isEdit = false;
+    }
+
+    void ShowCancelForm()
+    {
+        showCancelForm = true;
+        showAddForm = false;
+    }
+
+    void LoadData()
+    {
+        try
+        {
+            appointments = AppointmentService.GetAll();
+            errorMessage = null;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Save()
+    {
+        try
+        {
+            if (isEdit)
+            {
+                AppointmentService.Update(currentAppointment);
+            }
+            else
+            {
+                AppointmentService.Add(currentAppointment);
+            }
+
+            currentAppointment = new Appointment();
+            isEdit = false;
+            showAddForm = false;
+            LoadData();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Edit(Appointment a)
+    {
+        currentAppointment = new Appointment
+        {
+            AppointmentID = a.AppointmentID,
+            AnimalID = a.AnimalID,
+            VetID = a.VetID,
+            StartAt = a.StartAt,
+            Status = a.Status,
+            Notes = a.Notes
+        };
+        isEdit = true;
+        showAddForm = true;
+        showCancelForm = false;
+    }
+
+    void Delete(int id)
+    {
+        try
+        {
+            AppointmentService.Delete(id);
+            LoadData();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    void Cancel()
+    {
+        currentAppointment = new Appointment();
+        isEdit = false;
+        showAddForm = false;
+        showCancelForm = false;
+    }
+
+    void HandleConfirm()
+    {
+        NavigationManager.NavigateTo("/admin");
+    }
+
+    void NavigateHome()
+    {
+        NavigationManager.NavigateTo("/admin");
+    }
+}
+
