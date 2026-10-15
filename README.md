@@ -34,6 +34,8 @@ The design defines relationships between entities and considers integrity constr
 
 The presentation provides an overview of the project scope and proposed database design.
 
+https://github.com/gulseislak/VetClinicWeb/blob/master/CMPE232_ER_Section1_Group6.pptx
+
 
 
 
